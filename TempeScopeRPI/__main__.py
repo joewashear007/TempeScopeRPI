@@ -1,5 +1,18 @@
 
 print("Starting Open TempeScope")
-import sample
+import time
+import fan
+import mister
+import RPi.GPIO as GPIO
 
-sample.Start()
+GPIO.setmode(GPIO.BOARD)
+fan.Setup()
+mister.Setup()
+
+mister.On()
+fan.On()
+time.sleep(5)
+mister.Off()
+fan.Off()
+
+GPIO.cleanup()
