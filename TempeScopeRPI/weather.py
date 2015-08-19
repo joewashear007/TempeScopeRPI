@@ -1,12 +1,23 @@
-import openweathermapy.core as owm
+from pyowm import OWM
 
+#variables
+# ---------------------------------------
 location = "Oregon,OH"
-settings = {"units": "imperial", "lang": "EN"}
+api_key = "00cf720f141fb21188ddf5d69f2db8d1"
 
-views = {
-"summary": ["main.temp", "main.pressure", "main.humidity", "wind.speed",
-"clouds.all"]
-}
-# add rain.3h
-data = owm.get_current(location, **settings)
-print(data.get_dict(views["summary"]))
+# code 
+# -----------------------------------------
+
+def GetWeather():
+	owm = OWM(api_key)
+	obs = owm.weather_at_place(location)  
+	w = obs.get_weather()
+	weather = {}
+	weather['clouds'] = w.get_clouds()
+	weather['rain'] = w.get_rain()
+	weather['wind'] = w.get_wind()
+	weather['humidity'] = w.get_humidity()
+	weather['temp'] = w.get_temperature('fahrenheit')
+	return weather
+
+print(GetWeather())
