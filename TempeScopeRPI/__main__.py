@@ -36,6 +36,19 @@ class Ctrl:
 	def __del__(self):
 		GPIO.cleanup()
 
+#import sched, time
+#s = sched.scheduler(time.time, time.sleep)
+#def m():
+#	print("Running Master Loop")
+#	for x in s.queue:
+#		s.cancel(x)
+#	s.enter(1, 2, on, (True,))
+#	s.enter(15, 1, m)
+#	s.run()
+
+#def on(x):
+#	print("Active: ", x)
+#	s.enter(2, 2, on, (not x, ))
 		
 def main():
 	ctrl = Ctrl()
