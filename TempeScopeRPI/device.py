@@ -5,9 +5,11 @@ class Device:
         self.on = False
         self.simulation = simMode
         if not self.simulation:
-                  GPIO.setup(pin, GPIO.OUT)
+		import RPi.GPIO as GPIO
+		GPIO.setup(pin, GPIO.OUT)
     def power(self, on):
         self.on = on
         print(self.name, "=>", self.on)
         if not self.simulation:
-                  GPIO.output(self.pin, self.on)
+		import RPi.GPIO as GPIO
+		GPIO.output(self.pin, self.on)
