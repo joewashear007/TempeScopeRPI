@@ -16,9 +16,9 @@ class Ctrl:
         if not simMode:
             GPIO.setmode(GPIO.BOARD)
         self.devices = [
-		Device("Mister", 7, simMode), 
-		Device("Fan", 15, simMode), 
-	#	Device("Pump", 11, simMode)
+		Device("Mister", 7, simMode),
+		Device("Fan", 15, simMode),
+		Device("Pump", 11, simMode)
 	]
 
     def main(self):
@@ -38,7 +38,7 @@ class Ctrl:
 		d.power(False)
 	print("")
 	print("")
-    
+
 def main():
     ctrl = Ctrl()
     try:
