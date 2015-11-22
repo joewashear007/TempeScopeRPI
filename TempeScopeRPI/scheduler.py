@@ -3,9 +3,15 @@ import time
 import random
 import states
 from multiprocessing import Process
+from device import Device
+from controller import Ctrl
 
 s = sched.scheduler(time.time, time.sleep)
 threads = []
+
+
+
+ 
 
 def schedule(ctrl):
     cleanUp()
@@ -13,15 +19,8 @@ def schedule(ctrl):
     try:
         print('---------------------------------------------------')
         for device in ctrl.devices:
-            if device.name == "Mister":
-                on, off = states.GetCloudSchedule(ctrl.w)
-                print("Mister Timing: ", on, "/", off)
-            if device.name == "Fan":
-                on, off = states.GetWindSchedule(ctrl.w)
-                print("Fan Timing: ", on, "/", off)
-            if device.name == "Pump":
-                on, off = states.GetRainSchedule(ctrl.w)
-                print("Pump Timing: ", on, "/", off)
+            on, off = states.GetSchedule(device.name, ctrl.w)
+            print(device.name, " Timing: ", on, "/", off)
             z = Process(target=cycle, args=(device, on, off))
             z.daemon = True
             threads.append(z)
@@ -29,8 +28,9 @@ def schedule(ctrl):
         print('---------------------------------------------------')
         s.enter(30, 1, ctrl.processWeather, () )
         s.run()
-    except:
+    except Exception  as e:
         print("Running the process had an error ...")
+        print(e)
 
 def cleanUp():
     for t in threads:
@@ -51,6 +51,6 @@ def cycle(device, on, off):
 
 if __name__ == "__main__":
     try:
-        schedule(0)
+        schedule(Ctrl())
     finally:
         cleanUp()
