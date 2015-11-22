@@ -1,48 +1,56 @@
-import sched, time, random, threading
+import sched
+import time
+import random
+import states
 from multiprocessing import Process
 
-q = 0
 s = sched.scheduler(time.time, time.sleep)
 threads = []
-devices = ["pump", "mister", "fan"]
 
-def m(q):
+def schedule(ctrl):
     cleanUp()
-    print("Running Master Loop")
     threads[:] = []
-    for key in devices:
-        q = q + 1
-        on = random.uniform(0.5,5)
-        off = random.uniform(0.5,5)
-        z = Process(target=cycle, args=(key, on,off, q))
-        z.daemon = True
-        threads.append(z)
-        z.start()
-    # time.sleep(5)
-    s.enter(30, 1, m, (q, ))
-    s.run()
-    # s = threading.Timer(5, m, (q,))
-    # s.start()
-    # m(q)
+    try:
+        print('---------------------------------------------------')
+        for device in ctrl.devices:
+            if device.name == "Mister":
+                on, off = states.GetCloudSchedule(ctrl.w)
+                print("Mister Timing: ", on, "/", off)
+            if device.name == "Fan":
+                on, off = states.GetWindSchedule(ctrl.w)
+                print("Fan Timing: ", on, "/", off)
+            if device.name == "Pump":
+                on, off = states.GetRainSchedule(ctrl.w)
+                print("Pump Timing: ", on, "/", off)
+            z = Process(target=cycle, args=(device, on, off))
+            z.daemon = True
+            threads.append(z)
+            z.start()
+        print('---------------------------------------------------')
+        s.enter(30, 1, ctrl.processWeather, () )
+        s.run()
+    except:
+        print("Running the process had an error ...")
 
 def cleanUp():
     for t in threads:
         if t.is_alive():
             t.terminate()
             time.sleep(0.1)
-            print("Killed: ", q, " => ", t.is_alive(), t.exitcode)
-    # for t in threads:
+            print("Killed => ", t.is_alive(), t.exitcode)
 
-def cycle(key, on, off, q):
-    print(q, " => ", key , " - Active (", on ,")" )
-    time.sleep(on)
-    print(q, " => ", key , " - Deactive (", off ,")" )
-    time.sleep(off)
-    cycle(key, on, off, q)
-    # s.enter(devices[i][x], 2, cycle, (i, not a))
+def cycle(device, on, off):
+    try:
+        device.power(True)
+        time.sleep(on)
+        device.power(False)
+        time.sleep(off)
+        cycle(device, on, off)
+    except:
+        print("hmmm, process didn't end well")
 
 if __name__ == "__main__":
     try:
-        m(0)
+        schedule(0)
     finally:
         cleanUp()
